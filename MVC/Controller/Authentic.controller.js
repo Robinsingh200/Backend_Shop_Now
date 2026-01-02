@@ -185,6 +185,8 @@ export async function LoggIn(req, res) {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+
+
 export async function LogOut(req, res) {
   try {
     if (!req.user || !req.user._id) {

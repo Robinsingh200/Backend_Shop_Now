@@ -56,30 +56,31 @@ export const createProduct = async (req, res) => {
 // Get All Products
 
 export const getAllProducts = async (req, res) => {
-    try {
-        const products = await ProductsDetails.find()
-        if (!products) {
-            return res.status(404).json({
-                success: false,
-                message: "No Products available",
-                products: []
-            })
-        }
-        return res.status(200).json({
-            success: true,
-            message: "Product Added",
-            products
-        });
+  try {
+    const products = await ProductsDetails.find();
 
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-            success: false,
-            message: error.message
-        });
+    if (products.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No products available",
+        products: [],
+      });
     }
-};
 
+    return res.status(200).json({
+      success: true,
+      message: "Products fetched successfully",
+      products,
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 
 // Get Single Product
