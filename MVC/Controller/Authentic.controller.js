@@ -130,6 +130,7 @@ export async function verifiedSUer(req, res) {
 export async function LoggIn(req, res) {
   try {
     const { gmail, password } = req.body;
+     console.log("SECRET KEY =>", process.env.secret_key);
 
     if (!gmail || !password) {
       return res.status(400).json({
