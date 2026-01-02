@@ -1,5 +1,5 @@
 import express from 'express'
-import register, { changeThePassword, verifiedSUer, LoggIn, LogOut, Forgetpassword, VerifyOtp,AllUser, UserUpdate } from '../MVC/Controller/Authentic.controller.js';
+import register, { changeThePassword, verifiedSUer, LoggIn, LogOut, Forgetpassword,AllUser, UserUpdate } from '../MVC/Controller/Authentic.controller.js';
 import { isAuthcated ,IsAdmin} from '../MiddleWare/Isauthentics.logout.js';
 import { singleUpload } from '../MiddleWare/Multer.js';
 
@@ -18,7 +18,7 @@ router.post("/logout", isAuthcated, LogOut)
 
 forgetrouter.post("/forget", isAuthcated, Forgetpassword)
 
-forgetrouter.post("/Verifyotp/:gmail", VerifyOtp)
+// forgetrouter.post("/Verifyotp/:gmail", VerifyOtp)
 
 forgetrouter.post("/new-password/:gmail", changeThePassword)
 

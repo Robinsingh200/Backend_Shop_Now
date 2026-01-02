@@ -8,7 +8,6 @@ import sendOtp from '../../Otp_send/SendTheOpt.js';
 import cloudinary from '../../utils/Cloudnery.js';
 
 
-
 async function register(req, res) {
   try {
     const { firstName, lastName, gmail, password } = req.body;
@@ -63,8 +62,6 @@ async function register(req, res) {
     });
   }
 };
-
-
 
 
 export async function verifiedSUer(req, res) {
@@ -228,7 +225,6 @@ export async function LogOut(req, res) {
 
 
 
-
 export async function changeThePassword(req, res) {
   try {
     const { newPassword, confirfomPassword } = req.body;
@@ -372,4 +368,41 @@ export async function UserUpdate(req, res) {
 }
 
 
+export async function Forgetpassword(req, res) {
+  try {
+    const { gmail } = req.body;
+    const userFind = await AuthenticLogin.findOne({ gmail });
+
+    if (!userFind) {
+      return res.status(404).json({
+        success: false,
+        message: 'user not found'
+      })
+    }
+    const otpOfForget = Math.floor(100000 + Math.random() * 900000).toString()
+    const ExpireOtp = Date.now() + 10 * 60 * 1000
+    userFind.otp = otpOfForget;
+    userFind.otpExpire = ExpireOtp;
+
+    await sendOtp(otpOfForget, gmail)
+    await userFind.save();
+    console.log(userFind);
+    console.log(otpOfForget);
+
+    return res.status(200).json({
+      success: true,
+      message: 'otp send your Gmail'
+    })
+
+
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+
+
+}
 export default register;
