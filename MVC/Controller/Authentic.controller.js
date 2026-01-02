@@ -367,42 +367,60 @@ export async function UserUpdate(req, res) {
 
 }
 
+import crypto from "crypto";
 
 export async function Forgetpassword(req, res) {
   try {
     const { gmail } = req.body;
-    const userFind = await AuthenticLogin.findOne({ gmail });
 
-    if (!userFind) {
+    if (!gmail) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required"
+      });
+    }
+
+    const user = await AuthenticLogin.findOne({ gmail });
+
+    if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'user not found'
-      })
+        message: "User not found"
+      });
     }
-    const otpOfForget = Math.floor(100000 + Math.random() * 900000).toString()
-    const ExpireOtp = Date.now() + 10 * 60 * 1000
-    userFind.otp = otpOfForget;
-    userFind.otpExpire = ExpireOtp;
 
-    await sendOtp(otpOfForget, gmail)
-    await userFind.save();
-    console.log(userFind);
-    console.log(otpOfForget);
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Hash OTP
+    
+    const hashedOtp = crypto
+      .createHash("sha256")
+      .update(otp)
+      .digest("hex");
+
+    user.otp = hashedOtp;
+    user.otpExpire = Date.now() + 10 * 60 * 1000; // 10 min
+
+    await user.save();
+
+    // Send OTP after saving
+    await sendOtp(otp, gmail);
 
     return res.status(200).json({
       success: true,
-      message: 'otp send your Gmail'
-    })
-
-
+      message: "OTP sent to your email"
+    });
 
   } catch (error) {
+    console.error(error);
+
     return res.status(500).json({
       success: false,
-      message: error.message
-    })
+      message: "Failed to send OTP"
+    });
   }
-
-
 }
+
+
 export default register;
