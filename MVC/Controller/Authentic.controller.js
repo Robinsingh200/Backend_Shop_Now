@@ -171,7 +171,7 @@ export async function LoggIn(req, res) {
 
     const refreshToken = jwt.sign(
       { id: user._id },
-      process.env.JWT_SECRET,
+      process.env.secret_key,
       { expiresIn: "20d" }
     );
 
