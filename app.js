@@ -11,25 +11,28 @@ import { paymentrouter } from "./All Routes/Payment.js";
 
 const app = express();
 
-const corsConfig = {
-  origin: "https://frontend-shop-now-z7bu.vercel.app",
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-};
+// 🔥 1️⃣ CORS MUST BE FIRST
+app.use(
+  cors({
+    origin: "https://frontend-shop-now-z7bu.vercel.app",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
-// 🔥 CORS FIRST
-app.use(cors(corsConfig));
-app.options("*", cors(corsConfig));
+// 🔥 2️⃣ HANDLE PREFLIGHT REQUESTS
+app.options("*", cors());
 
-// Middlewares
+// 3️⃣ Other middlewares
 app.use(express.json());
 app.use(cookieParser());
 
-// MongoDB
+// ENV
 const MONGO_URL = process.env.MONGO_URL;
-let isConnected = false;
 
+// Mongo (serverless safe)
+let isConnected = false;
 async function connectionMongo() {
   if (isConnected) return;
   await mongoose.connect(MONGO_URL);
