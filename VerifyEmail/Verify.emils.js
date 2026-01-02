@@ -21,7 +21,7 @@ const VerificationEmail = (token, email) => {
           Thank you for registering with us.
            Please verify your email by clicking the link below:
 
-            http://localhost:5173/EmailVerify/${token}
+            https://frontend-shop-now-z7bu.vercel.app/${token}
 
                 If you did not create this account, please ignore this email.
 

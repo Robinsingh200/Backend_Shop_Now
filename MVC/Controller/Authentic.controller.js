@@ -393,7 +393,7 @@ export async function Forgetpassword(req, res) {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Hash OTP
-    
+
     const hashedOtp = crypto
       .createHash("sha256")
       .update(otp)
@@ -421,6 +421,7 @@ export async function Forgetpassword(req, res) {
     });
   }
 }
+
 
 
 export default register;
