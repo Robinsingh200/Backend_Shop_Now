@@ -125,34 +125,18 @@ export async function verifiedSUer(req, res) {
 }
 
 
-
-
 export async function LoggIn(req, res) {
   try {
     const { gmail, password } = req.body;
-     console.log("SECRET KEY =>", process.env.secret_key);
-
-    if (!gmail || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "All fields are required",
-      });
-    }
 
     const user = await AuthenticLogin.findOne({ gmail });
     if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "User does not exist",
-      });
+      return res.status(400).json({ success: false, message: "User not found" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid credentials",
-      });
+      return res.status(400).json({ success: false, message: "Wrong password" });
     }
 
     if (!user.isVerified) {
@@ -162,7 +146,6 @@ export async function LoggIn(req, res) {
       });
     }
 
-    // 🔐 JWT TOKENS
     const accessToken = jwt.sign(
       { id: user._id },
       process.env.secret_key,
@@ -175,15 +158,9 @@ export async function LoggIn(req, res) {
       { expiresIn: "20d" }
     );
 
-    // 🧹 REMOVE OLD SESSION (ONE LOGIN POLICY)
     await sessionToken.deleteMany({ UserId: user._id });
+    await sessionToken.create({ UserId: user._id });
 
-    // 🆕 CREATE NEW SESSION
-    await sessionToken.create({
-      UserId: user._id,
-    });
-
-    // 🍪 SET COOKIES
     return res
       .cookie("accessToken", accessToken, {
         httpOnly: true,
@@ -205,34 +182,17 @@ export async function LoggIn(req, res) {
       });
 
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    return res.status(500).json({ success: false, message: error.message });
   }
 }
 
-
+// 🚪 LOGOUT
 export async function LogOut(req, res) {
   try {
-    const UserId = req.user._id; // ✅
+    const UserId = req.user._id;
 
-    if (!UserId) {
-      return res.status(401).json({
-        success: false,
-        message: "User not authenticated",
-      });
-    }
-
-    // 🧹 Delete session from DB
     await sessionToken.deleteMany({ UserId });
 
-    // 🔄 Update login status
-    await AuthenticLogin.findByIdAndUpdate(UserId, {
-      isLoggedIn: false,
-    });
-
-    // 🍪 Clear cookies (VERY IMPORTANT)
     return res
       .clearCookie("accessToken", {
         httpOnly: true,
@@ -251,105 +211,8 @@ export async function LogOut(req, res) {
       });
 
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    return res.status(500).json({ success: false, message: error.message });
   }
-}
-
-
-
-
-
-
-export async function Forgetpassword(req, res) {
-  try {
-    const { gmail } = req.body;
-    const userFind = await AuthenticLogin.findOne({ gmail });
-
-    if (!userFind) {
-      return res.status(404).json({
-        success: false,
-        message: 'user not found'
-      })
-    }
-    const otpOfForget = Math.floor(100000 + Math.random() * 900000).toString()
-    const ExpireOtp = Date.now() + 10 * 60 * 1000
-    userFind.otp = otpOfForget;
-    userFind.otpExpire = ExpireOtp;
-
-    await sendOtp(otpOfForget, gmail)
-    await userFind.save();
-    console.log(userFind);
-    console.log(otpOfForget);
-
-    return res.status(200).json({
-      success: true,
-      message: 'otp send your Gmail'
-    })
-
-
-
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message
-    })
-  }
-
-
-}
-
-
-export async function VerifyOtp(req, res) {
-  try {
-    const { otp } = req.body;
-    const gmail = req.params.gmail
-    if (!otp) {
-      return res.status(400).json({
-        success: false,
-        message: `otp is required`
-      })
-    }
-
-    const user = await AuthenticLogin.findOne({ gmail })
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: `User not found`
-      })
-    }
-    if (Date.now() > user.otpExpire) {
-      return res.status(400).json({
-        success: false,
-        message: `otp has been expired`
-      })
-    }
-
-    if (!user.otp || !user.otpExpire) {
-      return res.status(400).json({
-        success: false,
-        message: `otp not gerated or already used `
-      })
-    }
-
-    user.otp = null
-    user.otpExpire = null
-    await user.save();
-
-    return res.status(200).json({
-      success: true,
-      message: `otp verified succesfully `
-    })
-
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message
-    })
-  }
-
 }
 
 

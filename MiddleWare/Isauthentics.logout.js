@@ -6,11 +6,11 @@ export const isAuthcated = async (req, res, next) => {
   try {
     let token;
 
-    // 1️⃣ COOKIE se token lo (main way)
-    if (req.cookies && req.cookies.accessToken) {
+    // 🔹 Cookie first
+    if (req.cookies?.accessToken) {
       token = req.cookies.accessToken;
     }
-
+    // 🔹 Header fallback
     else if (
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer ")
@@ -35,12 +35,25 @@ export const isAuthcated = async (req, res, next) => {
       });
     }
 
-    req.user = user; // ✅ VERY IMPORTANT
+    req.user = user;
     next();
   } catch (error) {
     return res.status(401).json({
       success: false,
       message: "Authentication failed",
+    });
+  }
+};
+
+
+
+export const IsAdmin = (req, res, next) => {
+  if (req.user?.role === "admin") {
+    next();
+  } else {
+    return res.status(403).json({
+      success: false,
+      message: "Admin access only",
     });
   }
 };
