@@ -226,6 +226,7 @@ export async function LogOut(req, res) {
 
 
 
+
 export async function changeThePassword(req, res) {
   try {
     const { newPassword, confirfomPassword } = req.body;

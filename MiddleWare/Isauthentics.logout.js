@@ -4,13 +4,13 @@ import "dotenv/config";
 
 export const isAuthcated = async (req, res, next) => {
   try {
-    let token;
+    let token = null;
 
-    // 🔹 Cookie first
+    // Cookie based auth
     if (req.cookies?.accessToken) {
       token = req.cookies.accessToken;
     }
-    // 🔹 Header fallback
+    // Header fallback
     else if (
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer ")
@@ -27,9 +27,16 @@ export const isAuthcated = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.secret_key);
 
+    if (!decoded?.id) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid token",
+      });
+    }
+
     const user = await AuthenticLogin.findById(decoded.id);
     if (!user) {
-      return res.status(404).json({
+      return res.status(401).json({
         success: false,
         message: "User not found",
       });
@@ -38,12 +45,14 @@ export const isAuthcated = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
+    console.error("AUTH ERROR =>", error.message);
     return res.status(401).json({
       success: false,
       message: "Authentication failed",
     });
   }
 };
+
 
 
 
