@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
-import router, { forgetrouter } from "./All Routes/Authentic.Router.js";
+import router from "./All Routes/Authentic.Router.js";
 import products_router from "./All Routes/Products.router.js";
 import cartRouter from "./All Routes/cart.routes.js";
 import { paymentrouter } from "./All Routes/Payment.js";
@@ -42,7 +42,6 @@ app.use(async (req, res, next) => {
 // Routes
 app.use("/api", router);
 app.use("/api", products_router);
-app.use("/api", forgetrouter);
 app.use("/api", cartRouter);
 app.use("/api", paymentrouter);
 

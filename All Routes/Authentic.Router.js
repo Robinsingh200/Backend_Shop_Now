@@ -6,7 +6,6 @@ import { singleUpload } from '../MiddleWare/Multer.js';
 
 const router = express.Router();
 
-const forgetrouter = express.Router();
 
 router.post("/register", register)
 
@@ -16,11 +15,11 @@ router.post("/log", LoggIn)
 
 router.post("/logout", isAuthcated, LogOut)
 
-forgetrouter.post("/forget", isAuthcated, Forgetpassword)
+router.post("/forget", Forgetpassword)
 
 // forgetrouter.post("/Verifyotp/:gmail", VerifyOtp)
 
-forgetrouter.post("/new-password/:gmail", changeThePassword)
+router.post("/new-password/:gmail", changeThePassword)
 
 router.get("/alluser",isAuthcated,IsAdmin, AllUser)
 
@@ -28,7 +27,3 @@ router.put("/update/:id",isAuthcated, singleUpload ,UserUpdate )
 
 
 export default router;
-
-export {
-    forgetrouter
-}
