@@ -18,7 +18,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: "https://shop-now-five-amber.vercel.app", 
+    origin: "https://frontend-shop-now-z7bu.vercel.app", 
     credentials: true,
   })
 );
