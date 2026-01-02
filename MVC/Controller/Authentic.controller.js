@@ -176,11 +176,11 @@ export async function LoggIn(req, res) {
     );
 
     // 🧹 REMOVE OLD SESSION (ONE LOGIN POLICY)
-    await sessionToken.deleteMany({ userId: user._id });
+    await sessionToken.deleteMany({ UserId: user._id });
 
     // 🆕 CREATE NEW SESSION
     await sessionToken.create({
-      userId: user._id,
+      UserId: user._id,
     });
 
     // 🍪 SET COOKIES
