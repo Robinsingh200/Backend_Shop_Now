@@ -164,7 +164,7 @@ export async function LoggIn(req, res) {
     // 🔐 JWT TOKENS
     const accessToken = jwt.sign(
       { id: user._id },
-      process.env.JWT_SECRET,
+      process.env.secret_key,
       { expiresIn: "7d" }
     );
 
