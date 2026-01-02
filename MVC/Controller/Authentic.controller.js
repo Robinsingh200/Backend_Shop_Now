@@ -185,10 +185,15 @@ export async function LoggIn(req, res) {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
-
-// 🚪 LOGOUT
 export async function LogOut(req, res) {
   try {
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authenticated",
+      });
+    }
+
     const UserId = req.user._id;
 
     await sessionToken.deleteMany({ UserId });
@@ -211,9 +216,14 @@ export async function LogOut(req, res) {
       });
 
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("LOGOUT ERROR =>", error);
+    return res.status(500).json({
+      success: false,
+      message: "Logout failed",
+    });
   }
 }
+
 
 
 export async function changeThePassword(req, res) {
